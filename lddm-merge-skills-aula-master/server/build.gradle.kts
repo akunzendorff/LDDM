@@ -39,6 +39,11 @@ dependencies {
     // Interação oficial JDBC
     implementation(libs.postgresql)
 
+    // Swagger UI
     implementation(libs.ktor.server.swagger)
     implementation(libs.ktor.server.status.pages)
+
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.ktor.client.cio.jvm)
+    implementation(libs.dotenv)
 }
