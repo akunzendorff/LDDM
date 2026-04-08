@@ -18,6 +18,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.github.cdimascio.dotenv.dotenv
 
 fun main() {
     embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
@@ -25,22 +26,37 @@ fun main() {
 }
 
 fun Application.module() {
+    val dotenv = dotenv()
+    val useSupabase = dotenv["USE_SUPABASE"]?.toBoolean() ?: false
+
     install(ContentNegotiation) { json() }
     install(StatusPages) {
         exception<Throwable> { call, cause ->
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                mapOf("error" to (cause.message ?: "Erro interno"))
-            )
+            call.respond(HttpStatusCode.InternalServerError,
+                mapOf("error" to (cause.message ?: "Erro interno")))
         }
     }
 
-    DatabaseFactory.init()
+    if (!useSupabase) {
+        DatabaseFactory.init() // Engine Local
+    }
 
     //  Instanciando os repositórios (Exposed = banco real)
-    val courseRepository = ExposedCourseRepository()
-    val lessonRepository = ExposedLessonRepository()
-    val questionRepository = ExposedQuestionRepository()
+    val courseRepository: com.fatec.lddm_merge_skills.repository.CourseRepository
+    val lessonRepository: com.fatec.lddm_merge_skills.repository.LessonRepository
+    val questionRepository: com.fatec.lddm_merge_skills.repository.QuestionRepository
+
+    if (useSupabase) {
+        courseRepository = com.fatec.lddm_merge_skills.db.SupabaseCourseRepository()
+        lessonRepository = com.fatec.lddm_merge_skills.db.SupabaseLessonRepository()
+        questionRepository = com.fatec.lddm_merge_skills.db.SupabaseQuestionRepository()
+        println("\n Usando banco na nuvem: Supabase (PostgREST)")
+    } else {
+        courseRepository = ExposedCourseRepository()
+        lessonRepository = ExposedLessonRepository()
+        questionRepository = ExposedQuestionRepository()
+        println("\n Usando banco local: Docker (PostgreSQL + Exposed)")
+    }
 
     routing {
         get("/") { call.respondText("Ktor: ${Greeting().greet()}") }
@@ -50,7 +66,7 @@ fun Application.module() {
 
         // Passando os repositórios para as rotas
         courseRoutes(courseRepository, lessonRepository)
-        lessonRoutes(questionRepository)
+        lessonRoutes(lessonRepository, questionRepository)
         questionRoutes(questionRepository)
         progressRoutes(questionRepository)
     }

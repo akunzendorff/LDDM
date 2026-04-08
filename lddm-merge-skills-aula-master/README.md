@@ -57,4 +57,27 @@ implementation(libs.ktor.server.swagger)
 implementation(libs.ktor.server.status.pages)
 ```
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+# Novas dependências 
+
+
+gradle/libs.versions.toml
+```
+[versions]
+# ...
+supabaseKt = "3.0.1"
+
+[libraries]
+# ...
+ktor-client-cio-jvm = { module = "io.ktor:ktor-client-cio-jvm", version.ref = "ktor" }
+supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabaseKt" }
+```
+
+server/build.gradle.kts
+```
+dependencies {
+    // === Semana 04: Supabase Client para Kotlin ===
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.ktor.client.cio.jvm)
+}
+```
