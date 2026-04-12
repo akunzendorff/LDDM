@@ -1,0 +1,108 @@
+openapi: "3.0.0"
+info:
+  title: "API de Gerenciamento de Livros"
+  description: "Atividade Fatec - CRUD Completo"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8080"
+paths:
+  /books:
+    get:
+      summary: "Listar todos os livros"
+      responses:
+        '200':
+          description: "Sucesso"
+    post:
+      summary: "Criar novo livro"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '201':
+          description: "Criado"
+  /books/{id}:
+    put:
+      summary: "Atualizar livro"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: "Atualizado"
+    delete:
+      summary: "Remover livro"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: "Removido"
+  /authors:
+    get:
+      summary: "Listar todos os autores"
+      responses:
+        '200':
+          description: "Sucesso"
+    post:
+      summary: "Criar novo autor"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        '201':
+          description: "Criado"
+  /authors/{id}:
+    put:
+      summary: "Atualizar autor"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        '200':
+          description: "Atualizado"
+    delete:
+      summary: "Remover autor"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: "Removido"
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        title: { type: string }
+        authorId: { type: integer }
+    Author:
+      type: object
+      properties:
+        name: { type: string }
